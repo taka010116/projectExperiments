@@ -1,4 +1,5 @@
 import flet
+import cv2
 from flet import (
     ElevatedButton,
     FilePicker,
@@ -12,11 +13,7 @@ from flet import (
 class fileLoad:
     path = Text()
 
-    def __init__(self):
-        pass
-
-    def decide_dirname(e:FilePickerResultEvent):
-        return 1
+    
 
 def main(page: Page):
     # ファイル選択ダイアログを閉じたときの処理
