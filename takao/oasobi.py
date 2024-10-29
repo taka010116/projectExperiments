@@ -107,5 +107,3 @@ def main(page: ft.Page):
     )
 
 ft.app(target=main)
-
-#https://rakuraku-engineer.com/posts/flet-base/
