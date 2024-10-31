@@ -1,13 +1,13 @@
-#円と四角形が描けます
-
 import flet as ft
-from flet import Text, ElevatedButton, PopupMenuItem, Row, Icon, Container, Stack, PopupMenuButton, margin, colors, icons
+from flet import Text, ElevatedButton, PopupMenuItem, Row, Icon, Container, Stack, PopupMenuButton, TextField, Column, margin, colors, icons
+
 
 class AppHeader(ft.Column):
-    def __init__(self, file, edit, tool, display, page, on_shape_select):
+    def __init__(self, file, edit, tool, display, page, on_shape_select, on_text_draw):
         super().__init__()
         self.page = page
         self.on_shape_select = on_shape_select
+        self.on_text_draw = on_text_draw
 
         file_button = ElevatedButton(text="file")
         edit_button = ElevatedButton(text="edit")
@@ -16,6 +16,7 @@ class AppHeader(ft.Column):
         self.appbar_items = [
             PopupMenuItem(text="Draw Circle", on_click=lambda e: self.on_shape_select("circle")),
             PopupMenuItem(text="Draw Square", on_click=lambda e: self.on_shape_select("square")),
+            PopupMenuItem(text="Draw Text", on_click=lambda e: self.on_text_draw()),
         ]
 
         self.page.appbar = ft.AppBar(
@@ -80,6 +81,15 @@ class ShapeDrawer:
         self.shape_container.controls.append(shape_element)
         self.page.update()
 
+    def draw_text(self, text, x, y):
+        text_element = ft.Draggable(
+            content=Text(text, size=24, color=colors.BLACK),
+            left=x,
+            top=y,
+        )
+        self.shape_container.controls.append(text_element)
+        self.page.update()
+
 
 def main(page: ft.Page):
     page.title = "Shape Drawer"
@@ -89,7 +99,26 @@ def main(page: ft.Page):
     def on_shape_select(shape):
         shape_drawer.draw_shape(shape)
 
-    AppHeader("file", "edit", "tool", "display", page, on_shape_select)
+    def on_text_draw():
+        def submit_text(e):
+            text = text_input.value
+            x = int(x_input.value)
+            y = int(y_input.value)
+            shape_drawer.draw_text(text, x, y)
+            page.dialog.open = False
+            page.update()
+
+        text_input = TextField(label="Text", width=200)
+        x_input = TextField(label="X Position", width=100)
+        y_input = TextField(label="Y Position", width=100)
+        submit_button = ElevatedButton("Draw Text", on_click=submit_text)
+
+        popup_content = Column([text_input, x_input, y_input, submit_button], alignment="start")
+        page.dialog = ft.AlertDialog(content=popup_content)
+        page.dialog.open = True
+        page.update()
+
+    AppHeader("file", "edit", "tool", "display", page, on_shape_select, on_text_draw)
 
     layout = Row(
         controls=[shape_drawer.shape_container],
